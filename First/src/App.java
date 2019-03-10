@@ -7,6 +7,7 @@ public class App {
 		System.out.println("second for local234test");
 		System.out.println("pull try");
 		System.out.println("first branch");
+		System.out.println("second branch");
 	}
 
 }
