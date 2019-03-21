@@ -1,16 +1,25 @@
 package com.javainuse;
 
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 
 public class SimpleRouteBuilder extends RouteBuilder {
-	//configure route for jms component
-    @Override
+	@Override
     public void configure() throws Exception {
-        from("file:C:/inputFolder").split().tokenize("\n").to("jms:queue:javainuse");
-        /* splitter EIP pattern is implemented above to split the file. defined jms queue is called javainuse at activemq console 
-         * jms 		 --> protocol
-         * queue:javainuse 	 --> context path(a.k.a topic)
-         * in this example javainuse topic will be created */
+        from("file:C:/inputFolder").split().tokenize("\n").to("direct:test");
+        
+//Recipient List- Dynamically set the recipients of the exchange 
+         //by creating the queue name at runtime
+        from("direct:test")
+        .process(new Processor() {
+            public void process(Exchange exchange) throws Exception {
+               String recipient = exchange.getIn().getBody().toString();
+               String recipientQueue="jms:queue:"+recipient;
+               exchange.getIn().setHeader("queue", recipientQueue);
+      }
+      }).recipientList(header("queue"));
+       
     }
 
 }
