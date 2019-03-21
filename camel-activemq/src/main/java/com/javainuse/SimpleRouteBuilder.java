@@ -15,7 +15,7 @@ public class SimpleRouteBuilder extends RouteBuilder {
         .process(new Processor() {
             public void process(Exchange exchange) throws Exception {
                String recipient = exchange.getIn().getBody().toString();
-               String recipientQueue="jms:queue:"+recipient;
+               String recipientQueue="jms:queue:"+recipient;		//creates queues with name at lines in inputfolder file
                exchange.getIn().setHeader("queue", recipientQueue);
       }
       }).recipientList(header("queue"));
