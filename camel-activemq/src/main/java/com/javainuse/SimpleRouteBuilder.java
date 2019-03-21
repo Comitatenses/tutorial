@@ -3,14 +3,23 @@ package com.javainuse;
 import org.apache.camel.builder.RouteBuilder;
 
 public class SimpleRouteBuilder extends RouteBuilder {
-	//configure route for jms component
+
     @Override
     public void configure() throws Exception {
-        from("file:C:/inputFolder").split().tokenize("\n").to("jms:queue:javainuse");
-        /* splitter EIP pattern is implemented above to split the file. defined jms queue is called javainuse at activemq console 
-         * jms 		 --> protocol
-         * queue:javainuse 	 --> context path(a.k.a topic)
-         * in this example javainuse topic will be created */
+        from("file:C:/inputFolder").split().tokenize("\n").to("direct:test");
+        
+        //Content Based routing- Route the message based on the token it contains.
+        from("direct:test"). 
+        choice().
+        when(body().contains("javainuse1"))
+        .to("jms:queue:javainuse1").
+        when(body().contains("javainuse2"))
+        .to("jms:queue:javainuse2")
+        .when(body().contains("javainuse3"))
+        .to("jms:queue:javainuse3").
+        otherwise().
+        to("jms:queue:otherwise");
+       
     }
 
 }
